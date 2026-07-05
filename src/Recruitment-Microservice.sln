@@ -13,13 +13,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebAPI", "WebAPI", "{DA1C26B7-A026-48ED-A14A-63DE51BCB59D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candidate.Domain", "Services\Candidate\Core\Candidate.Domain\Candidate.Domain.csproj", "{983E15FD-0286-4787-BF22-D1849031A085}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candidate.Domain", "Services\Candidate\Core\Candidate.Domain\Candidate.Domain.csproj", "{983E15FD-0286-4787-BF22-D1849031A085}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candidate.Application", "Services\Candidate\Core\Candidate.Application\Candidate.Application.csproj", "{6071CE7C-B2D0-405E-AFD1-81FF3E435FE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candidate.Application", "Services\Candidate\Core\Candidate.Application\Candidate.Application.csproj", "{6071CE7C-B2D0-405E-AFD1-81FF3E435FE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candidate.Infrastructure", "Services\Candidate\Infrastructure\Candidate.Infrastructure\Candidate.Infrastructure.csproj", "{D65EF33B-E28B-4A34-A748-E5CA673BF2EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candidate.Infrastructure", "Services\Candidate\Infrastructure\Candidate.Infrastructure\Candidate.Infrastructure.csproj", "{D65EF33B-E28B-4A34-A748-E5CA673BF2EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candidate.WebAPI", "Services\Candidate\WebAPI\Candidate.WebAPI\Candidate.WebAPI.csproj", "{75067E30-FD92-49A5-854B-72A702841D5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Candidate.WebAPI", "Services\Candidate\WebAPI\Candidate.WebAPI\Candidate.WebAPI.csproj", "{75067E30-FD92-49A5-854B-72A702841D5E}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E041CEFE-4488-4DA8-BC69-D68E8678E7DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1F4C9D30-3708-4383-9556-F66BD913EE3E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Candidate", "Candidate", "{CEA1AA51-3206-4A60-A8BC-58A3645E1901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candidate.Application.Tests", "tests\Candidate\Candidate.Application.Tests\Candidate.Application.Tests.csproj", "{96DCFBF5-9D8C-416A-B911-56A2ABE7A7EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Candidate.WebAPI.Tests", "tests\Candidate\Candidate.WebAPI.Tests\Candidate.WebAPI.Tests.csproj", "{2D7EC443-7EA6-46E8-AA22-7D3E5E1B55FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +53,18 @@ Global
 		{75067E30-FD92-49A5-854B-72A702841D5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75067E30-FD92-49A5-854B-72A702841D5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75067E30-FD92-49A5-854B-72A702841D5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E041CEFE-4488-4DA8-BC69-D68E8678E7DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E041CEFE-4488-4DA8-BC69-D68E8678E7DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E041CEFE-4488-4DA8-BC69-D68E8678E7DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E041CEFE-4488-4DA8-BC69-D68E8678E7DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96DCFBF5-9D8C-416A-B911-56A2ABE7A7EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96DCFBF5-9D8C-416A-B911-56A2ABE7A7EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96DCFBF5-9D8C-416A-B911-56A2ABE7A7EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96DCFBF5-9D8C-416A-B911-56A2ABE7A7EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D7EC443-7EA6-46E8-AA22-7D3E5E1B55FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D7EC443-7EA6-46E8-AA22-7D3E5E1B55FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D7EC443-7EA6-46E8-AA22-7D3E5E1B55FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D7EC443-7EA6-46E8-AA22-7D3E5E1B55FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,6 +78,9 @@ Global
 		{6071CE7C-B2D0-405E-AFD1-81FF3E435FE3} = {33A345C8-B541-4422-A006-F0C09E7AAEAE}
 		{D65EF33B-E28B-4A34-A748-E5CA673BF2EB} = {07202BC8-EB06-48B5-B760-F1505E505780}
 		{75067E30-FD92-49A5-854B-72A702841D5E} = {DA1C26B7-A026-48ED-A14A-63DE51BCB59D}
+		{CEA1AA51-3206-4A60-A8BC-58A3645E1901} = {1F4C9D30-3708-4383-9556-F66BD913EE3E}
+		{96DCFBF5-9D8C-416A-B911-56A2ABE7A7EC} = {CEA1AA51-3206-4A60-A8BC-58A3645E1901}
+		{2D7EC443-7EA6-46E8-AA22-7D3E5E1B55FB} = {CEA1AA51-3206-4A60-A8BC-58A3645E1901}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {516C209D-C1CA-4033-95E9-C8C20886F93E}

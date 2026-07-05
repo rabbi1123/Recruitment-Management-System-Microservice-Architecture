@@ -1,0 +1,2 @@
+# Shell scripts used by Linux containers must use LF line endings.
+src/docker/db/*.sh text eol=lf
