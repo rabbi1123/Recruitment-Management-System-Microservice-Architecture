@@ -16,12 +16,15 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   IMAGE_NAME: candidatewebapi
+  GITHUB_PACKAGES_URL: https://nuget.pkg.github.com/rabbi1123/index.json
+  GITHUB_PACKAGES_OWNER: rabbi1123
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials":[{"endpoint":"https://nuget.pkg.github.com/rabbi1123/index.json","username":"rabbi1123","password":"${{ secrets.NUGET_TOKEN }}"}]}'
 
     steps:
       - name: Checkout
@@ -32,12 +35,17 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Install NuGet credential provider
+        run: sh -c "$(curl -fsSL https://aka.ms/install-artifacts-credprovider.sh)"
+
       - name: Authenticate to GitHub Packages
         working-directory: src
         run: |
-          dotnet nuget update source github \
-            --username ${{ github.actor }} \
-            --password ${{ secrets.GITHUB_TOKEN }} \
+          dotnet nuget remove source github --configfile NuGet.config 2>/dev/null || true
+          dotnet nuget add source "${{ env.GITHUB_PACKAGES_URL }}" \
+            --name github \
+            --username ${{ env.GITHUB_PACKAGES_OWNER }} \
+            --password "${{ secrets.NUGET_TOKEN }}" \
             --store-password-in-clear-text \
             --configfile NuGet.config
 
@@ -75,7 +83,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
           build-args: |
             BUILD_CONFIGURATION=Release
-            NUGET_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
-            GITHUB_ACTOR=${{ github.actor }}
+            NUGET_AUTH_TOKEN=${{ secrets.NUGET_TOKEN }}
+            GITHUB_ACTOR=${{ env.GITHUB_PACKAGES_OWNER }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
