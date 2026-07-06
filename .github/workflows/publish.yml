@@ -83,7 +83,8 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
           build-args: |
             BUILD_CONFIGURATION=Release
-            NUGET_AUTH_TOKEN=${{ secrets.TEXTPASSWORD }}
             GITHUB_ACTOR=${{ env.GITHUB_PACKAGES_OWNER }}
+          secrets: |
+            nuget_auth_token=${{ secrets.TEXTPASSWORD }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

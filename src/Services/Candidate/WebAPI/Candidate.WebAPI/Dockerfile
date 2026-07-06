@@ -7,16 +7,22 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-ARG NUGET_AUTH_TOKEN
-ARG GITHUB_ACTOR=docker
+ARG GITHUB_ACTOR=rabbi1123
 WORKDIR /src
 COPY ["NuGet.config", "./"]
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="{\"endpointCredentials\": [{\"endpoint\":\"https://nuget.pkg.github.com/rabbi1123/index.json\", \"username\":\"${GITHUB_ACTOR}\", \"password\":\"${NUGET_AUTH_TOKEN}\"}]}"
 COPY ["Services/Candidate/WebAPI/Candidate.WebAPI/Candidate.WebAPI.csproj", "Services/Candidate/WebAPI/Candidate.WebAPI/"]
 COPY ["Services/Candidate/Core/Candidate.Application/Candidate.Application.csproj", "Services/Candidate/Core/Candidate.Application/"]
 COPY ["Services/Candidate/Core/Candidate.Domain/Candidate.Domain.csproj", "Services/Candidate/Core/Candidate.Domain/"]
 COPY ["Services/Candidate/Infrastructure/Candidate.Infrastructure/Candidate.Infrastructure.csproj", "Services/Candidate/Infrastructure/Candidate.Infrastructure/"]
-RUN dotnet restore "./Services/Candidate/WebAPI/Candidate.WebAPI/Candidate.WebAPI.csproj"
+RUN --mount=type=secret,id=nuget_auth_token \
+    dotnet nuget remove source github --configfile NuGet.config 2>/dev/null || true && \
+    dotnet nuget add source "https://nuget.pkg.github.com/rabbi1123/index.json" \
+      --name github \
+      --username "${GITHUB_ACTOR}" \
+      --password "$(cat /run/secrets/nuget_auth_token)" \
+      --store-password-in-clear-text \
+      --configfile NuGet.config && \
+    dotnet restore "./Services/Candidate/WebAPI/Candidate.WebAPI/Candidate.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/Services/Candidate/WebAPI/Candidate.WebAPI"
 RUN dotnet build "./Candidate.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
