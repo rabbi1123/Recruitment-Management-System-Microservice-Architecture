@@ -23,8 +23,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
-      VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials":[{"endpoint":"https://nuget.pkg.github.com/rabbi1123/index.json","username":"rabbi1123","password":"${{ secrets.NUGET_TOKEN }}"}]}'
+      NUGET_AUTH_TOKEN: ${{ secrets.TEXTPASSWORD }}
+      VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials":[{"endpoint":"https://nuget.pkg.github.com/rabbi1123/index.json","username":"rabbi1123","password":"${{ secrets.TEXTPASSWORD }}"}]}'
 
     steps:
       - name: Checkout
@@ -45,7 +45,7 @@ jobs:
           dotnet nuget add source "${{ env.GITHUB_PACKAGES_URL }}" \
             --name github \
             --username ${{ env.GITHUB_PACKAGES_OWNER }} \
-            --password "${{ secrets.NUGET_TOKEN }}" \
+            --password "${{ secrets.TEXTPASSWORD }}" \
             --store-password-in-clear-text \
             --configfile NuGet.config
 
@@ -83,7 +83,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
           build-args: |
             BUILD_CONFIGURATION=Release
-            NUGET_AUTH_TOKEN=${{ secrets.NUGET_TOKEN }}
+            NUGET_AUTH_TOKEN=${{ secrets.TEXTPASSWORD }}
             GITHUB_ACTOR=${{ env.GITHUB_PACKAGES_OWNER }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
