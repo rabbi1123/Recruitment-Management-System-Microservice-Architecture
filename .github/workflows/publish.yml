@@ -1,0 +1,90 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  packages: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  IMAGE_NAME: candidatewebapi
+  GITHUB_PACKAGES_URL: https://nuget.pkg.github.com/rabbi1123/index.json
+  GITHUB_PACKAGES_OWNER: rabbi1123
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.TEXTPASSWORD }}
+      VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials":[{"endpoint":"https://nuget.pkg.github.com/rabbi1123/index.json","username":"rabbi1123","password":"${{ secrets.TEXTPASSWORD }}"}]}'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install NuGet credential provider
+        run: sh -c "$(curl -fsSL https://aka.ms/install-artifacts-credprovider.sh)"
+
+      - name: Authenticate to GitHub Packages
+        working-directory: src
+        run: |
+          dotnet nuget remove source github --configfile NuGet.config 2>/dev/null || true
+          dotnet nuget add source "${{ env.GITHUB_PACKAGES_URL }}" \
+            --name github \
+            --username ${{ env.GITHUB_PACKAGES_OWNER }} \
+            --password "${{ secrets.TEXTPASSWORD }}" \
+            --store-password-in-clear-text \
+            --configfile NuGet.config
+
+      - name: Restore dependencies
+        working-directory: src
+        run: dotnet restore Recruitment-Microservice.sln
+
+      - name: Build
+        working-directory: src
+        run: dotnet build Recruitment-Microservice.sln --configuration Release --no-restore
+
+      - name: Run unit tests
+        working-directory: src
+        run: dotnet test Recruitment-Microservice.sln --configuration Release --no-build --verbosity normal
+
+  build-docker-image:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: src
+          file: src/Services/Candidate/WebAPI/Candidate.WebAPI/Dockerfile
+          push: false
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          build-args: |
+            BUILD_CONFIGURATION=Release
+            GITHUB_ACTOR=${{ env.GITHUB_PACKAGES_OWNER }}
+          secrets: |
+            nuget_auth_token=${{ secrets.TEXTPASSWORD }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

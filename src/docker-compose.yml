@@ -1,0 +1,53 @@
+version: '3.4'
+
+services:
+  candidatedb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: candidatedb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${Candidate_DB_PASSWORD}
+      Candidate_DB_PASSWORD: ${Candidate_DB_PASSWORD}
+    restart: always
+    ports:
+      - "1436:1433"
+    volumes:
+      - candidatedb_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$Candidate_DB_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    depends_on:
+      candidatedb:
+        condition: service_healthy
+    environment:
+      Candidate_DB_PASSWORD: ${Candidate_DB_PASSWORD}
+      DB_HOST: candidatedb
+    volumes:
+      - ./docker/db/init-db.sh:/init-db.sh:ro
+      - ./Services/Candidate/WebAPI/Candidate.WebAPI/DB/CandidateService.sql:/scripts/CandidateService.sql:ro
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+    restart: "no"
+
+  candidate.webapi:
+    image: ${DOCKER_REGISTRY-}candidatewebapi
+    build:
+      context: .
+      dockerfile: Services/Candidate/WebAPI/Candidate.WebAPI/Dockerfile
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      Candidate_DB_PASSWORD: ${Candidate_DB_PASSWORD}
+    volumes:
+      - candidate_uploads:/app/uploads
+
+volumes:
+  candidatedb_data:
+  candidate_uploads:
