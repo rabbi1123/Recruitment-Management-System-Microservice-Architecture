@@ -48,6 +48,53 @@ services:
     volumes:
       - candidate_uploads:/app/uploads
 
+  organizationdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: organizationdb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${Organization_DB_PASSWORD}
+      Organization_DB_PASSWORD: ${Organization_DB_PASSWORD}
+    restart: always
+    ports:
+      - "1437:1433"
+    volumes:
+      - organizationdb_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$Organization_DB_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  organization-db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    depends_on:
+      organizationdb:
+        condition: service_healthy
+    environment:
+      Organization_DB_PASSWORD: ${Organization_DB_PASSWORD}
+      DB_HOST: organizationdb
+    volumes:
+      - ./docker/db/init-organization-db.sh:/init-db.sh:ro
+      - ./Services/Organization/WebAPI/Organization.WebAPI/DB/OrganizationServiceDB.sql:/scripts/OrganizationServiceDB.sql:ro
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+    restart: "no"
+
+  organization.webapi:
+    image: ${DOCKER_REGISTRY-}organizationwebapi
+    build:
+      context: .
+      dockerfile: Services/Organization/WebAPI/Organization.WebAPI/Dockerfile
+    depends_on:
+      organization-db-init:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=organizationdb;Database=OrganizationDB;User Id=sa;Password=${Organization_DB_PASSWORD};TrustServerCertificate=True"
+
 volumes:
   candidatedb_data:
   candidate_uploads:
+  organizationdb_data:
+
