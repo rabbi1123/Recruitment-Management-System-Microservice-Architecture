@@ -4,7 +4,8 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "candidate.webapi": "StartDebugging"
+        "candidate.webapi": "StartDebugging",
+        "organization.webapi": "StartDebugging"
       }
     }
   }
