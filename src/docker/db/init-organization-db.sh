@@ -17,9 +17,18 @@ until /opt/mssql-tools18/bin/sqlcmd -S "$DB_HOST" -U sa -P "$SA_PASSWORD" -C -h 
   sleep 2
 done
 
+echo "Ensuring OrganizationDB exists..."
+/opt/mssql-tools18/bin/sqlcmd -S "$DB_HOST" -U sa -P "$SA_PASSWORD" -C -Q \
+  "IF DB_ID('OrganizationDB') IS NULL CREATE DATABASE OrganizationDB;"
+
+echo "Waiting for OrganizationDB to be online..."
+until /opt/mssql-tools18/bin/sqlcmd -S "$DB_HOST" -U sa -P "$SA_PASSWORD" -C -d OrganizationDB -Q "SELECT 1" > /dev/null 2>&1; do
+  sleep 2
+done
+
 echo "Checking if schema already exists..."
-EXISTS=$(/opt/mssql-tools18/bin/sqlcmd -S "$DB_HOST" -U sa -P "$SA_PASSWORD" -C -h -1 -W -Q \
-  "SET NOCOUNT ON; IF DB_ID('OrganizationDB') IS NULL SELECT 0 ELSE SELECT COUNT(*) FROM OrganizationDB.sys.tables WHERE name = 'Organizations'" 2>/dev/null | tr -d '[:space:]' || echo "0")
+EXISTS=$(/opt/mssql-tools18/bin/sqlcmd -S "$DB_HOST" -U sa -P "$SA_PASSWORD" -C -d OrganizationDB -h -1 -W -Q \
+  "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.tables WHERE name = 'Organizations'" 2>/dev/null | tr -d '[:space:]' || echo "0")
 
 if [ "$EXISTS" = "1" ]; then
   echo "Schema already initialized. Skipping SQL script."

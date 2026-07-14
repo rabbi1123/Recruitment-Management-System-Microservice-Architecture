@@ -1,0 +1,55 @@
+@Job.WebAPI_HostAddress = http://localhost:5262
+
+### Jobs
+POST {{Job.WebAPI_HostAddress}}/api/jobs/get-list
+Content-Type: application/json
+
+{}
+
+###
+POST {{Job.WebAPI_HostAddress}}/api/jobs/get-by-id
+Content-Type: application/json
+
+{
+  "id": 1
+}
+
+###
+POST {{Job.WebAPI_HostAddress}}/api/jobs/create
+Content-Type: application/json
+
+{
+  "organizationId": 1,
+  "recruiterId": 1,
+  "title": "Senior Software Engineer",
+  "department": "Engineering",
+  "employmentType": "FullTime",
+  "location": "Dhaka",
+  "isRemote": true,
+  "experienceMin": 3,
+  "experienceMax": 7,
+  "salaryMin": 80000,
+  "salaryMax": 120000,
+  "currency": "USD",
+  "description": "Build and maintain recruitment platform services.",
+  "status": "Draft"
+}
+
+### Job Skills
+POST {{Job.WebAPI_HostAddress}}/api/job-skills/create
+Content-Type: application/json
+
+{
+  "jobId": 1,
+  "skillName": "C Sharp",
+  "isRequired": true
+}
+
+### Saved Jobs
+POST {{Job.WebAPI_HostAddress}}/api/saved-jobs/create
+Content-Type: application/json
+
+{
+  "candidateId": 1,
+  "jobId": 1
+}
