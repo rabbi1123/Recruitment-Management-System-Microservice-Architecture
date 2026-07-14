@@ -5,7 +5,8 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "candidate.webapi": "StartDebugging",
-        "organization.webapi": "StartDebugging"
+        "organization.webapi": "StartDebugging",
+        "job.webapi": "StartDebugging"
       }
     }
   }

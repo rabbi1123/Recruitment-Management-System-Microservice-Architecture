@@ -93,8 +93,55 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: "Server=organizationdb;Database=OrganizationDB;User Id=sa;Password=${Organization_DB_PASSWORD};TrustServerCertificate=True"
 
+  jobdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: jobdb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${Job_DB_PASSWORD}
+      Job_DB_PASSWORD: ${Job_DB_PASSWORD}
+    restart: always
+    ports:
+      - "1438:1433"
+    volumes:
+      - jobdb_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$Job_DB_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  job-db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    depends_on:
+      jobdb:
+        condition: service_healthy
+    environment:
+      Job_DB_PASSWORD: ${Job_DB_PASSWORD}
+      DB_HOST: jobdb
+    volumes:
+      - ./docker/db/init-job-db.sh:/init-db.sh:ro
+      - ./Services/Job/WebAPI/Job.WebAPI/DB/JobServiceDB.sql:/scripts/JobServiceDB.sql:ro
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+    restart: "no"
+
+  job.webapi:
+    image: ${DOCKER_REGISTRY-}jobwebapi
+    build:
+      context: .
+      dockerfile: Services/Job/WebAPI/Job.WebAPI/Dockerfile
+    depends_on:
+      job-db-init:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=jobdb;Database=JobDB;User Id=sa;Password=${Job_DB_PASSWORD};TrustServerCertificate=True"
+
 volumes:
   candidatedb_data:
   candidate_uploads:
   organizationdb_data:
+  jobdb_data:
+
 
