@@ -6,7 +6,8 @@
       "serviceActions": {
         "candidate.webapi": "StartDebugging",
         "organization.webapi": "StartDebugging",
-        "job.webapi": "StartDebugging"
+        "job.webapi": "StartDebugging",
+        "recruitment.webapi": "StartDebugging"
       }
     }
   }
