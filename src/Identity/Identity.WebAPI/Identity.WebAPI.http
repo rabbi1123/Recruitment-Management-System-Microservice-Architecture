@@ -1,0 +1,77 @@
+@Identity.WebAPI_HostAddress = http://localhost:8084
+
+### Register
+POST {{Identity.WebAPI_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "recruiter@example.com",
+  "password": "Recruiter@123!"
+}
+
+### Login
+POST {{Identity.WebAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@identity.local",
+  "password": "Admin@12345!"
+}
+
+### Refresh Token
+POST {{Identity.WebAPI_HostAddress}}/api/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Revoke Token
+POST {{Identity.WebAPI_HostAddress}}/api/auth/revoke-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Forgot Password
+POST {{Identity.WebAPI_HostAddress}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "recruiter@example.com"
+}
+
+### Reset Password
+POST {{Identity.WebAPI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "recruiter@example.com",
+  "token": "{{resetToken}}",
+  "newPassword": "Recruiter@1234!"
+}
+
+### Assign Role (Admin JWT required)
+POST {{Identity.WebAPI_HostAddress}}/api/roles/assign
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "role": "Recruiter"
+}
+
+### Remove Role (Admin JWT required)
+DELETE {{Identity.WebAPI_HostAddress}}/api/roles/remove
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "role": "Recruiter"
+}
+
+### Get User Roles (Admin JWT required)
+GET {{Identity.WebAPI_HostAddress}}/api/roles/user/{{userId}}
+Authorization: Bearer {{accessToken}}

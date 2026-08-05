@@ -83,19 +83,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebAPI", "WebAPI", "{48B738A5-365C-444B-9143-12F8BFFE9179}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.Domain", "Services\Recruitment\Core\Recruitment.Domain\Recruitment.Domain.csproj", "{5059CA51-BE4E-4D74-88BD-4D51920EB637}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recruitment.Domain", "Services\Recruitment\Core\Recruitment.Domain\Recruitment.Domain.csproj", "{5059CA51-BE4E-4D74-88BD-4D51920EB637}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.Application", "Services\Recruitment\Core\Recruitment.Application\Recruitment.Application.csproj", "{0D16B902-92B5-4113-9559-14D2183AA6BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recruitment.Application", "Services\Recruitment\Core\Recruitment.Application\Recruitment.Application.csproj", "{0D16B902-92B5-4113-9559-14D2183AA6BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.Infrastructure", "Services\Recruitment\Infrastructure\Recruitment.Infrastructure\Recruitment.Infrastructure.csproj", "{7FDA1CF8-AD60-4199-922D-98F33779199F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recruitment.Infrastructure", "Services\Recruitment\Infrastructure\Recruitment.Infrastructure\Recruitment.Infrastructure.csproj", "{7FDA1CF8-AD60-4199-922D-98F33779199F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.WebAPI", "Services\Recruitment\WebAPI\Recruitment.WebAPI\Recruitment.WebAPI.csproj", "{12EABB09-D874-4B5C-9A10-C9AF22408195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recruitment.WebAPI", "Services\Recruitment\WebAPI\Recruitment.WebAPI\Recruitment.WebAPI.csproj", "{12EABB09-D874-4B5C-9A10-C9AF22408195}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Recruitment", "Recruitment", "{0D200305-216F-4626-9220-2763577A2EB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.Application.Tests", "tests\Recruitment\Recruitment.Application.Tests\Recruitment.Application.Tests.csproj", "{1107E61E-71DB-4ACE-AAF0-EA461258D50C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recruitment.Application.Tests", "tests\Recruitment\Recruitment.Application.Tests\Recruitment.Application.Tests.csproj", "{1107E61E-71DB-4ACE-AAF0-EA461258D50C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.WebAPI.Tests", "tests\Recruitment\Recruitment.WebAPI.Tests\Recruitment.WebAPI.Tests.csproj", "{9DF4F699-0D9C-400E-B343-5BF7B43142F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recruitment.WebAPI.Tests", "tests\Recruitment\Recruitment.WebAPI.Tests\Recruitment.WebAPI.Tests.csproj", "{9DF4F699-0D9C-400E-B343-5BF7B43142F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{65EFF21C-D66B-44B2-B78C-275871960158}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.Domain", "Identity\Identity.Domain\Identity.Domain.csproj", "{E9BDF4B2-8D48-45F3-B52C-26D200F0ED4E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.Application", "Identity\Identity.Application\Identity.Application.csproj", "{1BC60879-E572-41AA-8FD2-23D2F3505DD0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.Infrastructure", "Identity\Identity.Infrastructure\Identity.Infrastructure.csproj", "{6DE6ED1C-A678-4CDC-BBCE-24822BCFAF85}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.WebAPI", "Identity\Identity.WebAPI\Identity.WebAPI.csproj", "{5D1BE72E-7971-42A4-9B22-C23FF96147DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApiGateway", "WebApiGateway", "{DA61797A-DB0F-4141-8887-E77712CD092A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPIGateway", "WebApiGateway\WebAPIGateway\WebAPIGateway.csproj", "{BCC96970-6009-4850-AB27-2C80D976EDA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -203,6 +217,26 @@ Global
 		{9DF4F699-0D9C-400E-B343-5BF7B43142F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DF4F699-0D9C-400E-B343-5BF7B43142F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DF4F699-0D9C-400E-B343-5BF7B43142F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9BDF4B2-8D48-45F3-B52C-26D200F0ED4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9BDF4B2-8D48-45F3-B52C-26D200F0ED4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9BDF4B2-8D48-45F3-B52C-26D200F0ED4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9BDF4B2-8D48-45F3-B52C-26D200F0ED4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BC60879-E572-41AA-8FD2-23D2F3505DD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BC60879-E572-41AA-8FD2-23D2F3505DD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BC60879-E572-41AA-8FD2-23D2F3505DD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BC60879-E572-41AA-8FD2-23D2F3505DD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DE6ED1C-A678-4CDC-BBCE-24822BCFAF85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DE6ED1C-A678-4CDC-BBCE-24822BCFAF85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DE6ED1C-A678-4CDC-BBCE-24822BCFAF85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DE6ED1C-A678-4CDC-BBCE-24822BCFAF85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D1BE72E-7971-42A4-9B22-C23FF96147DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D1BE72E-7971-42A4-9B22-C23FF96147DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D1BE72E-7971-42A4-9B22-C23FF96147DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D1BE72E-7971-42A4-9B22-C23FF96147DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCC96970-6009-4850-AB27-2C80D976EDA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCC96970-6009-4850-AB27-2C80D976EDA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCC96970-6009-4850-AB27-2C80D976EDA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCC96970-6009-4850-AB27-2C80D976EDA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -252,6 +286,11 @@ Global
 		{0D200305-216F-4626-9220-2763577A2EB5} = {1F4C9D30-3708-4383-9556-F66BD913EE3E}
 		{1107E61E-71DB-4ACE-AAF0-EA461258D50C} = {0D200305-216F-4626-9220-2763577A2EB5}
 		{9DF4F699-0D9C-400E-B343-5BF7B43142F3} = {0D200305-216F-4626-9220-2763577A2EB5}
+		{E9BDF4B2-8D48-45F3-B52C-26D200F0ED4E} = {65EFF21C-D66B-44B2-B78C-275871960158}
+		{1BC60879-E572-41AA-8FD2-23D2F3505DD0} = {65EFF21C-D66B-44B2-B78C-275871960158}
+		{6DE6ED1C-A678-4CDC-BBCE-24822BCFAF85} = {65EFF21C-D66B-44B2-B78C-275871960158}
+		{5D1BE72E-7971-42A4-9B22-C23FF96147DD} = {65EFF21C-D66B-44B2-B78C-275871960158}
+		{BCC96970-6009-4850-AB27-2C80D976EDA0} = {DA61797A-DB0F-4141-8887-E77712CD092A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {516C209D-C1CA-4033-95E9-C8C20886F93E}

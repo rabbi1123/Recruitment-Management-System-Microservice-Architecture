@@ -1,0 +1,27 @@
+@WebAPIGateway_HostAddress = http://localhost:8085
+
+### Health
+GET {{WebAPIGateway_HostAddress}}/health
+Accept: application/json
+
+### Login (anonymous via Identity)
+POST {{WebAPIGateway_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@identity.local",
+  "password": "Admin@12345!"
+}
+
+### Protected Candidate route (set token from login response)
+@accessToken = paste-access-token-here
+
+POST {{WebAPIGateway_HostAddress}}/api/candidates/get-list
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}
+
+### Protected Roles route (Admin)
+GET {{WebAPIGateway_HostAddress}}/api/roles/user/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
