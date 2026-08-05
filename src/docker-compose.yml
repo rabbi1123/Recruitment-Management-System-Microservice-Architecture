@@ -183,12 +183,65 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: "Server=recruitmentdb;Database=RecruitmentDB;User Id=sa;Password=${Recruitment_DB_PASSWORD};TrustServerCertificate=True"
 
+  identitydb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: identitydb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${Identity_DB_PASSWORD}
+      Identity_DB_PASSWORD: ${Identity_DB_PASSWORD}
+    restart: always
+    ports:
+      - "1440:1433"
+    volumes:
+      - identitydb_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$Identity_DB_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  identity.webapi:
+    image: ${DOCKER_REGISTRY-}identitywebapi
+    build:
+      context: .
+      dockerfile: Identity/Identity.WebAPI/Dockerfile
+    depends_on:
+      identitydb:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__IdentityDb: "Server=identitydb;Database=IdentityDb;User Id=sa;Password=${Identity_DB_PASSWORD};TrustServerCertificate=True;Encrypt=False"
+      JwtSettings__Issuer: Identity.WebAPI
+      JwtSettings__Audience: RecruitmentManagementSystem
+      JwtSettings__SecretKey: ${SecretKey}
+      JwtSettings__AccessTokenExpirationMinutes: "15"
+      JwtSettings__RefreshTokenExpirationDays: "7"
+
+  webapigateway:
+    image: ${DOCKER_REGISTRY-}webapigateway
+    build:
+      context: .
+      dockerfile: WebApiGateway/WebAPIGateway/Dockerfile
+    depends_on:
+      - candidate.webapi
+      - organization.webapi
+      - job.webapi
+      - recruitment.webapi
+      - identity.webapi
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      JwtSettings__Issuer: Identity.WebAPI
+      JwtSettings__Audience: RecruitmentManagementSystem
+      JwtSettings__SecretKey: DevOnly-ChangeMe-Min32Chars-IdentityKey!
+
 volumes:
   candidatedb_data:
   candidate_uploads:
   organizationdb_data:
   jobdb_data:
   recruitmentdb_data:
+  identitydb_data:
 
 
 
