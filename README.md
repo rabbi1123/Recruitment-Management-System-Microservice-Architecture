@@ -281,7 +281,7 @@ cd src
 cp .env.example .env
 ```
 
-Edit `src/.env` and set strong passwords (and optional JWT secret). See [Environment Variables](#-environment-variables).
+Edit `src/.env` and set strong passwords (and optional JWT secret).
 
 ### 3. Restore packages
 
@@ -438,26 +438,6 @@ docker compose down -v
 | RabbitMQ UI | 15672 | 15672 |
 
 RabbitMQ Management UI: http://localhost:15672 (default `guest` / `guest` unless overridden).
-
----
-
-## 🔐 Environment Variables
-
-Copy `src/.env.example` → `src/.env`.
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `Candidate_DB_PASSWORD` | SA password for Candidate SQL Server | `YourStrong!Passw0rd` |
-| `Organization_DB_PASSWORD` | SA password for Organization SQL Server | `YourStrong!Passw0rd` |
-| `Job_DB_PASSWORD` | SA password for Job SQL Server | `YourStrong!Passw0rd` |
-| `Recruitment_DB_PASSWORD` | SA password for Recruitment SQL Server | `YourStrong!Passw0rd` |
-| `Identity_DB_PASSWORD` | SA password for Identity SQL Server | `YourStrong!Passw0rd` |
-| `RABBITMQ_USERNAME` | RabbitMQ user | `guest` |
-| `RABBITMQ_PASSWORD` | RabbitMQ password | `guest` |
-| `SecretKey` | JWT signing key used by Identity & Gateway in Compose (`JwtSettings__SecretKey`) | `DevOnly-ChangeMe-Min32Chars-IdentityKey!` |
-| `DOCKER_REGISTRY` | Optional image registry prefix | _(empty for local)_ |
-
-> **Security tip:** Never commit `.env`. Use secrets managers in production and rotate `SecretKey` / DB passwords regularly. Access tokens are short-lived; treat refresh tokens as credentials.
 
 ---
 
