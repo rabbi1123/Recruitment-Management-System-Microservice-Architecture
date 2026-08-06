@@ -10,6 +10,7 @@
     <PackageReference Include="Common.DataAccessService" Version="1.0.0" />
     <PackageReference Include="Dapper" Version="2.1.79" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.28" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
@@ -20,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Candidate.Application\Candidate.Application.csproj" />
     <ProjectReference Include="..\..\Core\Candidate.Domain\Candidate.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\BuildingBlocks\Messaging.Contracts\Messaging.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

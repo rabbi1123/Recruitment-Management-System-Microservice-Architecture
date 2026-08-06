@@ -12,8 +12,8 @@ namespace Candidate.Application.Features.Candidate.Commands.UpdateCandidates
 					.WithMessage(catalog.Messages["PositiveNumber"]);
 
 			RuleFor(x => x.UserId)
-				.GreaterThan(0)
-					.WithMessage(catalog.Messages["PositiveNumber"]);
+				.NotEmpty()
+					.WithMessage(catalog.Messages["Required"]);
 
 			RuleFor(x => x.FirstName)
 				.NotEmpty()

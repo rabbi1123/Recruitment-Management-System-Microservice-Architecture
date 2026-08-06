@@ -1,6 +1,26 @@
 version: '3.4'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: always
+
   candidatedb:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: candidatedb
@@ -43,8 +63,13 @@ services:
     depends_on:
       db-init:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     environment:
       Candidate_DB_PASSWORD: ${Candidate_DB_PASSWORD}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
     volumes:
       - candidate_uploads:/app/uploads
 
@@ -210,6 +235,8 @@ services:
     depends_on:
       identitydb:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       ConnectionStrings__IdentityDb: "Server=identitydb;Database=IdentityDb;User Id=sa;Password=${Identity_DB_PASSWORD};TrustServerCertificate=True;Encrypt=False"
       JwtSettings__Issuer: Identity.WebAPI
@@ -217,6 +244,9 @@ services:
       JwtSettings__SecretKey: ${SecretKey}
       JwtSettings__AccessTokenExpirationMinutes: "15"
       JwtSettings__RefreshTokenExpirationDays: "7"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
 
   webapigateway:
     image: ${DOCKER_REGISTRY-}webapigateway
@@ -236,6 +266,7 @@ services:
       JwtSettings__SecretKey: DevOnly-ChangeMe-Min32Chars-IdentityKey!
 
 volumes:
+  rabbitmq_data:
   candidatedb_data:
   candidate_uploads:
   organizationdb_data:
