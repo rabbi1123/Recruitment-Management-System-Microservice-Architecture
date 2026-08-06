@@ -4,7 +4,7 @@
     {
         bool IsAuthenticated { get; }
 
-        long UserId { get; }
+        Guid UserId { get; }
         string Username { get; }
         string FullName { get; }
         string Email { get; }

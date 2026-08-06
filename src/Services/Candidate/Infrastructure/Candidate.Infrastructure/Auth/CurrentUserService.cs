@@ -10,7 +10,7 @@ namespace Candidate.Infrastructure.Auth
         private const string SystemUsername = "System";
 
         public bool IsAuthenticated { get; }
-        public long UserId { get; }
+        public Guid UserId { get; }
         public string Username { get; }
         public string FullName { get; }
         public string Email { get; }
@@ -34,9 +34,10 @@ namespace Candidate.Infrastructure.Auth
                     ? SystemUsername
                     : usernameClaim;
 
-                if (long.TryParse(
-                    user.FindFirstValue(CustomClaimTypes.UserId),
-                    out var userId))
+                var userIdClaim = user.FindFirstValue(CustomClaimTypes.UserId)
+                    ?? user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (Guid.TryParse(userIdClaim, out var userId))
                 {
                     UserId = userId;
                 }

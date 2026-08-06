@@ -11,9 +11,11 @@ using Candidate.Infrastructure.Data;
 using Candidate.Infrastructure.DomainEvents;
 using Candidate.Infrastructure.Files;
 using Candidate.Infrastructure.Images;
+using Candidate.Infrastructure.Messaging;
 using Candidate.Infrastructure.Repositories;
 using Common.Platform.Domain.Abstractions;
 using Dapper;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,31 @@ namespace Candidate.Infrastructure
 				.BindConfiguration("JwtSettings")
 				.ValidateDataAnnotations()
 				.ValidateOnStart();
+
+			services
+				.AddOptions<RabbitMqSettings>()
+				.Bind(configuration.GetSection(RabbitMqSettings.SectionName))
+				.ValidateDataAnnotations()
+				.ValidateOnStart();
+
+			var rabbitMqSettings = configuration.GetSection(RabbitMqSettings.SectionName).Get<RabbitMqSettings>()
+				?? new RabbitMqSettings();
+
+			services.AddMassTransit(x =>
+			{
+				x.AddConsumer<EmployeeRegisteredConsumer>();
+
+				x.UsingRabbitMq((context, cfg) =>
+				{
+					cfg.Host(rabbitMqSettings.Host, h =>
+					{
+						h.Username(rabbitMqSettings.Username);
+						h.Password(rabbitMqSettings.Password);
+					});
+
+					cfg.ConfigureEndpoints(context);
+				});
+			});
 
 			services.Configure<DbConnections>(options =>
 			{

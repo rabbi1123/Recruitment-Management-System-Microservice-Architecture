@@ -2,6 +2,7 @@ using Identity.Application.Common.Exceptions;
 using Identity.Application.Common.Interfaces;
 using Identity.Domain.Constants;
 using Identity.Domain.Entities;
+using Messaging.Contracts.Events;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,17 +14,20 @@ public sealed class IdentityService : IIdentityService
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IEmailService _emailService;
+    private readonly IEventPublisher _eventPublisher;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
         SignInManager<ApplicationUser> signInManager,
-        IEmailService emailService)
+        IEmailService emailService,
+        IEventPublisher eventPublisher)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _signInManager = signInManager;
         _emailService = emailService;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<ApplicationUser> RegisterAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -60,6 +64,11 @@ public sealed class IdentityService : IIdentityService
         }
 
         await _userManager.AddToRoleAsync(user, Roles.Employee);
+
+        await _eventPublisher.PublishAsync(
+            new EmployeeRegisteredEvent(user.Id, user.Email!),
+            cancellationToken);
+
         return user;
     }
 

@@ -10,8 +10,10 @@ COPY ["Identity/Identity.WebAPI/Identity.WebAPI.csproj", "Identity/Identity.WebA
 COPY ["Identity/Identity.Application/Identity.Application.csproj", "Identity/Identity.Application/"]
 COPY ["Identity/Identity.Domain/Identity.Domain.csproj", "Identity/Identity.Domain/"]
 COPY ["Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "Identity/Identity.Infrastructure/"]
+COPY ["BuildingBlocks/Messaging.Contracts/Messaging.Contracts.csproj", "BuildingBlocks/Messaging.Contracts/"]
 RUN dotnet restore "./Identity/Identity.WebAPI/Identity.WebAPI.csproj"
 COPY Identity/ Identity/
+COPY BuildingBlocks/ BuildingBlocks/
 WORKDIR "/src/Identity/Identity.WebAPI"
 RUN dotnet build "./Identity.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

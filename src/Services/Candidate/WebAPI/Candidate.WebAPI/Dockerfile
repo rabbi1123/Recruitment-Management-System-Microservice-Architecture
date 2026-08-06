@@ -14,6 +14,7 @@ COPY ["Services/Candidate/WebAPI/Candidate.WebAPI/Candidate.WebAPI.csproj", "Ser
 COPY ["Services/Candidate/Core/Candidate.Application/Candidate.Application.csproj", "Services/Candidate/Core/Candidate.Application/"]
 COPY ["Services/Candidate/Core/Candidate.Domain/Candidate.Domain.csproj", "Services/Candidate/Core/Candidate.Domain/"]
 COPY ["Services/Candidate/Infrastructure/Candidate.Infrastructure/Candidate.Infrastructure.csproj", "Services/Candidate/Infrastructure/Candidate.Infrastructure/"]
+COPY ["BuildingBlocks/Messaging.Contracts/Messaging.Contracts.csproj", "BuildingBlocks/Messaging.Contracts/"]
 RUN --mount=type=secret,id=nuget_auth_token \
     dotnet nuget remove source github --configfile NuGet.config 2>/dev/null || true && \
     dotnet nuget add source "https://nuget.pkg.github.com/rabbi1123/index.json" \

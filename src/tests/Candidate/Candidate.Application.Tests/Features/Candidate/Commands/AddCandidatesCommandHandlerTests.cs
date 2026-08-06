@@ -119,7 +119,7 @@ public class AddCandidatesCommandHandlerTests
 
 	private static AddCandidatesCommand CreateValidCommand() => new()
 	{
-		UserId = 42,
+		UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
 		FirstName = "Jane",
 		LastName = "Doe",
 		Email = "jane.doe@example.com",

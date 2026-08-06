@@ -8,24 +8,8 @@ namespace Candidate.Application.Features.Candidate.Commands.AddCandidates
 		public AddCandidatesCommandValidator(IValidationCatalog catalog)
 		{
 			RuleFor(x => x.UserId)
-				.GreaterThan(0)
-					.WithMessage(catalog.Messages["PositiveNumber"]);
-
-			RuleFor(x => x.FirstName)
 				.NotEmpty()
-					.WithMessage(catalog.Messages["Required"])
-				.MaximumLength(100)
-					.WithMessage(catalog.Messages["MaxLength"])
-				.Matches(catalog.Patterns["EnglishName"])
-					.WithMessage(catalog.Messages["EnglishNameRule"]);
-
-			RuleFor(x => x.LastName)
-				.NotEmpty()
-					.WithMessage(catalog.Messages["Required"])
-				.MaximumLength(100)
-					.WithMessage(catalog.Messages["MaxLength"])
-				.Matches(catalog.Patterns["EnglishName"])
-					.WithMessage(catalog.Messages["EnglishNameRule"]);
+					.WithMessage(catalog.Messages["Required"]);
 
 			RuleFor(x => x.Email)
 				.NotEmpty()

@@ -11,7 +11,7 @@ namespace Candidate.Domain.Candidate
 	{
 		public Candidates(
 			long id,
-			long userId,
+			Guid userId,
 			string firstName,
 			string lastName,
 			string email,
@@ -54,7 +54,7 @@ namespace Candidate.Domain.Candidate
 
 		public long Id { get; set; }
 
-		public long UserId { get; set; }
+		public Guid UserId { get; set; }
 
 		public string FirstName { get; set; }
 
@@ -85,7 +85,7 @@ namespace Candidate.Domain.Candidate
 		public string? UpdatedBy { get; set; }
 
 		public static Candidates Create(
-			long userId,
+			Guid userId,
 			string firstName,
 			string lastName,
 			string email,
