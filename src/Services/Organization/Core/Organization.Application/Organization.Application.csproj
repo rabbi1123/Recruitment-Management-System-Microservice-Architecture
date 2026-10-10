@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Organization.Domain\Organization.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\BuildingBlocks\Messaging.Contracts\Messaging.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\BuildingBlocks\Messaging.RabbitMq\Messaging.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>

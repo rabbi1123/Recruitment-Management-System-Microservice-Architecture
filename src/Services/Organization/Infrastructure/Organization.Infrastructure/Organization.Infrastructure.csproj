@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Organization.Application\Organization.Application.csproj" />
     <ProjectReference Include="..\..\Core\Organization.Domain\Organization.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\BuildingBlocks\Messaging.RabbitMq\Messaging.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,12 @@
 using Job.Application.Abstractions.Data;
+using Job.Application.Common.Data;
 using Job.Application.Features.Job.Commands.UpdateJobs;
 using Job.Domain.Job;
 using Common.Platform.Domain.Abstractions;
+using Messaging.Contracts.Events.Email;
+using Messaging.Contracts.Events.Push;
+using Messaging.Contracts.Events.Sms;
+using Messaging.RabbitMq;
 using Moq;
 using Xunit;
 
@@ -10,12 +15,19 @@ namespace Job.Application.Tests.Features.Job.Commands;
 public class UpdateJobsCommandHandlerTests
 {
 	private readonly Mock<IGenericRepository<Jobs>> _repositoryMock;
+	private readonly PostCommitActions _postCommit;
+	private readonly Mock<IIntegrationEventPublisher> _publisherMock;
 	private readonly UpdateJobsCommandHandler _handler;
 
 	public UpdateJobsCommandHandlerTests()
 	{
 		_repositoryMock = new Mock<IGenericRepository<Jobs>>();
-		_handler = new UpdateJobsCommandHandler(_repositoryMock.Object);
+		_postCommit = new PostCommitActions();
+		_publisherMock = new Mock<IIntegrationEventPublisher>();
+		_handler = new UpdateJobsCommandHandler(
+			_repositoryMock.Object,
+			_postCommit,
+			_publisherMock.Object);
 	}
 
 	[Fact]
@@ -37,6 +49,32 @@ public class UpdateJobsCommandHandlerTests
 		Assert.True(result.IsSuccess);
 		Assert.NotNull(result.Data);
 		Assert.True(result.Data!.IsSuccess);
+
+		await _postCommit.RunAsync(CancellationToken.None);
+		_publisherMock.Verify(
+			p => p.PublishAsync(
+				It.Is<JobPublishedEmailEvent>(e =>
+					e.JobId == command.Id &&
+					e.OrganizationId == command.OrganizationId &&
+					e.Title == command.Title),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
+		_publisherMock.Verify(
+			p => p.PublishAsync(
+				It.Is<JobPublishedSmsEvent>(e =>
+					e.JobId == command.Id &&
+					e.OrganizationId == command.OrganizationId &&
+					e.Title == command.Title),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
+		_publisherMock.Verify(
+			p => p.PublishAsync(
+				It.Is<JobPublishedPushEvent>(e =>
+					e.JobId == command.Id &&
+					e.OrganizationId == command.OrganizationId &&
+					e.Title == command.Title),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
 
 		_repositoryMock.Verify(
 			r => r.UpdateAsync(It.Is<Jobs>(j =>
@@ -69,6 +107,17 @@ public class UpdateJobsCommandHandlerTests
 		Assert.Equal((int)HttpResponseStatusCodes.NotFound, result.Status);
 		Assert.Equal(Error.NotFound("Job").Message, result.Error!.Message);
 		_repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<Jobs>()), Times.Never);
+
+		await _postCommit.RunAsync(CancellationToken.None);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedEmailEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedSmsEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedPushEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
 	}
 
 	[Fact]
@@ -90,6 +139,47 @@ public class UpdateJobsCommandHandlerTests
 		Assert.True(result.IsFailure);
 		Assert.Equal((int)HttpResponseStatusCodes.NotFound, result.Status);
 		Assert.Equal(Error.NotFound("Jobs").Message, result.Error!.Message);
+
+		await _postCommit.RunAsync(CancellationToken.None);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedEmailEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedSmsEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedPushEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+	}
+
+	[Fact]
+	public async Task Handle_WhenAlreadyPublished_DoesNotPublishAgain()
+	{
+		var command = CreateValidCommand();
+		var existing = CreateExistingJob(command);
+		existing.Status = "Published";
+
+		_repositoryMock
+			.Setup(r => r.GetByIdAsync(command.Id))
+			.ReturnsAsync(existing);
+
+		_repositoryMock
+			.Setup(r => r.UpdateAsync(It.IsAny<Jobs>()))
+			.ReturnsAsync(1);
+
+		var result = await _handler.Handle(command, CancellationToken.None);
+
+		Assert.True(result.IsSuccess);
+		await _postCommit.RunAsync(CancellationToken.None);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedEmailEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedSmsEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
+		_publisherMock.Verify(
+			p => p.PublishAsync(It.IsAny<JobPublishedPushEvent>(), It.IsAny<CancellationToken>()),
+			Times.Never);
 	}
 
 	private static UpdateJobsCommand CreateValidCommand() => new()

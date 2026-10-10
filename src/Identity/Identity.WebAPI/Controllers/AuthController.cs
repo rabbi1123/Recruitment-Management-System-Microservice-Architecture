@@ -2,8 +2,10 @@ using Identity.Application.Features.Auth.ForgotPassword;
 using Identity.Application.Features.Auth.Login;
 using Identity.Application.Features.Auth.RefreshToken;
 using Identity.Application.Features.Auth.Register;
+using Identity.Application.Features.Auth.ResendVerification;
 using Identity.Application.Features.Auth.ResetPassword;
 using Identity.Application.Features.Auth.RevokeToken;
+using Identity.Application.Features.Auth.VerifyEmail;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +28,26 @@ public sealed class AuthController : ControllerBase
     [AllowAnonymous]
     [EnableRateLimiting("auth")]
     public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(command, cancellationToken);
+        return Ok(response);
+    }
+
+    [HttpGet("verify-email")]
+    [AllowAnonymous]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> VerifyEmail([FromQuery] string token, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new VerifyEmailCommand(token), cancellationToken);
+        return Ok(response);
+    }
+
+    [HttpPost("resend-verification")]
+    [AllowAnonymous]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> ResendVerification(
+        [FromBody] ResendVerificationCommand command,
+        CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(command, cancellationToken);
         return Ok(response);

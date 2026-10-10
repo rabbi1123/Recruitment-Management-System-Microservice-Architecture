@@ -38,6 +38,13 @@ services:
     ports:
       - "8084:8080"
 
+  notification.webapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8086:8080"
+
   webapigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

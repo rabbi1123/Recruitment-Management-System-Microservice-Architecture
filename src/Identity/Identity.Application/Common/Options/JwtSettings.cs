@@ -32,4 +32,7 @@ public class IdentitySettings
 
     [Range(1, 1440)]
     public int LockoutMinutes { get; set; } = 15;
+
+    [Range(1, 1440)]
+    public int EmailVerificationTokenMinutes { get; set; } = 30;
 }

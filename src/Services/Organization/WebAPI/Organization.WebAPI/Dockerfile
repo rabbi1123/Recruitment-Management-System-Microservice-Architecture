@@ -12,6 +12,8 @@ COPY ["Services/Organization/WebAPI/Organization.WebAPI/Organization.WebAPI.cspr
 COPY ["Services/Organization/Core/Organization.Application/Organization.Application.csproj", "Services/Organization/Core/Organization.Application/"]
 COPY ["Services/Organization/Core/Organization.Domain/Organization.Domain.csproj", "Services/Organization/Core/Organization.Domain/"]
 COPY ["Services/Organization/Infrastructure/Organization.Infrastructure/Organization.Infrastructure.csproj", "Services/Organization/Infrastructure/Organization.Infrastructure/"]
+COPY ["BuildingBlocks/Messaging.Contracts/Messaging.Contracts.csproj", "BuildingBlocks/Messaging.Contracts/"]
+COPY ["BuildingBlocks/Messaging.RabbitMq/Messaging.RabbitMq.csproj", "BuildingBlocks/Messaging.RabbitMq/"]
 RUN dotnet restore "./Services/Organization/WebAPI/Organization.WebAPI/Organization.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/Services/Organization/WebAPI/Organization.WebAPI"

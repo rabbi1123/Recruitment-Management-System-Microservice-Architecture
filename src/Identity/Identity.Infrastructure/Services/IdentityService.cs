@@ -3,6 +3,10 @@ using Identity.Application.Common.Interfaces;
 using Identity.Domain.Constants;
 using Identity.Domain.Entities;
 using Messaging.Contracts.Events;
+using Messaging.Contracts.Events.Email;
+using Messaging.Contracts.Events.Push;
+using Messaging.Contracts.Events.Sms;
+using Messaging.RabbitMq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,21 +17,21 @@ public sealed class IdentityService : IIdentityService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly IEmailService _emailService;
-    private readonly IEventPublisher _eventPublisher;
+    private readonly IIntegrationEventPublisher _eventPublisher;
+    private readonly IEmailVerificationTokenService _emailVerificationTokens;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
         SignInManager<ApplicationUser> signInManager,
-        IEmailService emailService,
-        IEventPublisher eventPublisher)
+        IIntegrationEventPublisher eventPublisher,
+        IEmailVerificationTokenService emailVerificationTokens)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _signInManager = signInManager;
-        _emailService = emailService;
         _eventPublisher = eventPublisher;
+        _emailVerificationTokens = emailVerificationTokens;
     }
 
     public async Task<ApplicationUser> RegisterAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -44,7 +48,7 @@ public sealed class IdentityService : IIdentityService
             Id = Guid.NewGuid(),
             Email = normalizedEmail,
             UserName = normalizedEmail,
-            EmailConfirmed = true,
+            EmailConfirmed = false,
             IsActive = true,
             CreatedOn = DateTime.UtcNow,
             LockoutEnabled = true
@@ -65,8 +69,22 @@ public sealed class IdentityService : IIdentityService
 
         await _userManager.AddToRoleAsync(user, Roles.Employee);
 
+        var verificationToken = await _emailVerificationTokens.IssueAsync(user.Id, cancellationToken);
+
         await _eventPublisher.PublishAsync(
             new EmployeeRegisteredEvent(user.Id, user.Email!),
+            cancellationToken);
+        await _eventPublisher.PublishAsync(
+            new EmployeeRegisteredEmailEvent(user.Id, user.Email!),
+            cancellationToken);
+        await _eventPublisher.PublishAsync(
+            new EmployeeRegisteredSmsEvent(user.Id, user.Email!),
+            cancellationToken);
+        await _eventPublisher.PublishAsync(
+            new EmployeeRegisteredPushEvent(user.Id, user.Email!),
+            cancellationToken);
+        await _eventPublisher.PublishAsync(
+            new UserVerificationEmailEvent(user.Id, user.Email!, verificationToken),
             cancellationToken);
 
         return user;
@@ -101,11 +119,35 @@ public sealed class IdentityService : IIdentityService
             throw new UnauthorizedException("Invalid credentials");
         }
 
+        if (!user.EmailConfirmed)
+        {
+            throw new UnauthorizedException("Please verify your email address before logging in.");
+        }
+
         user.LastLogin = DateTime.UtcNow;
         user.UpdatedOn = DateTime.UtcNow;
         await _userManager.UpdateAsync(user);
 
         return user;
+    }
+
+    public Task VerifyEmailAsync(string token, CancellationToken cancellationToken = default)
+    {
+        return _emailVerificationTokens.VerifyAsync(token, cancellationToken);
+    }
+
+    public async Task ResendVerificationAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByEmailAsync(email.Trim());
+        if (user is null || !user.IsActive || user.EmailConfirmed)
+        {
+            return;
+        }
+
+        var verificationToken = await _emailVerificationTokens.IssueAsync(user.Id, cancellationToken);
+        await _eventPublisher.PublishAsync(
+            new UserVerificationEmailEvent(user.Id, user.Email!, verificationToken),
+            cancellationToken);
     }
 
     public async Task ForgotPasswordAsync(string email, CancellationToken cancellationToken = default)
@@ -116,9 +158,6 @@ public sealed class IdentityService : IIdentityService
             // Anti-enumeration: do nothing visible to caller
             return;
         }
-
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        await _emailService.SendPasswordResetAsync(user.Email!, token, cancellationToken);
     }
 
     public async Task ResetPasswordAsync(

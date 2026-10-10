@@ -9,6 +9,10 @@ public interface IIdentityService
 
     Task<ApplicationUser> LoginAsync(string email, string password, CancellationToken cancellationToken = default);
 
+    Task VerifyEmailAsync(string token, CancellationToken cancellationToken = default);
+
+    Task ResendVerificationAsync(string email, CancellationToken cancellationToken = default);
+
     Task ForgotPasswordAsync(string email, CancellationToken cancellationToken = default);
 
     Task ResetPasswordAsync(string email, string token, string newPassword, CancellationToken cancellationToken = default);

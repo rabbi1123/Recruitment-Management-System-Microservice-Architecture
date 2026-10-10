@@ -21,6 +21,14 @@ services:
       start_period: 20s
     restart: always
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+
   candidatedb:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: candidatedb
@@ -115,8 +123,13 @@ services:
     depends_on:
       organization-db-init:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     environment:
       ConnectionStrings__DefaultConnection: "Server=organizationdb;Database=OrganizationDB;User Id=sa;Password=${Organization_DB_PASSWORD};TrustServerCertificate=True"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
 
   jobdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -160,8 +173,13 @@ services:
     depends_on:
       job-db-init:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     environment:
       ConnectionStrings__DefaultConnection: "Server=jobdb;Database=JobDB;User Id=sa;Password=${Job_DB_PASSWORD};TrustServerCertificate=True"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
 
   recruitmentdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -205,8 +223,13 @@ services:
     depends_on:
       recruitment-db-init:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     environment:
       ConnectionStrings__DefaultConnection: "Server=recruitmentdb;Database=RecruitmentDB;User Id=sa;Password=${Recruitment_DB_PASSWORD};TrustServerCertificate=True"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
 
   identitydb:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -248,6 +271,62 @@ services:
       RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
       RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
 
+  notificationdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: notificationdb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${Notification_DB_PASSWORD}
+      Notification_DB_PASSWORD: ${Notification_DB_PASSWORD}
+    restart: always
+    ports:
+      - "1441:1433"
+    volumes:
+      - notificationdb_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$Notification_DB_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  notification-db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    depends_on:
+      notificationdb:
+        condition: service_healthy
+    environment:
+      Notification_DB_PASSWORD: ${Notification_DB_PASSWORD}
+      DB_HOST: notificationdb
+    volumes:
+      - ./docker/db/init-notification-db.sh:/init-db.sh:ro
+      - ./Services/Notification/WebAPI/Notification.WebAPI/DB/NotificationServiceDB.sql:/scripts/NotificationServiceDB.sql:ro
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+    restart: "no"
+
+  notification.webapi:
+    image: ${DOCKER_REGISTRY-}notificationwebapi
+    build:
+      context: .
+      dockerfile: Services/Notification/WebAPI/Notification.WebAPI/Dockerfile
+    depends_on:
+      notification-db-init:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=notificationdb;Database=NotificationDB;User Id=sa;Password=${Notification_DB_PASSWORD};TrustServerCertificate=True"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USERNAME:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
+      Smtp__Host: mailpit
+      Smtp__Port: "1025"
+      Smtp__From: noreply@recruitment.local
+      Smtp__EnableSsl: "false"
+
   webapigateway:
     image: ${DOCKER_REGISTRY-}webapigateway
     build:
@@ -259,6 +338,7 @@ services:
       - job.webapi
       - recruitment.webapi
       - identity.webapi
+      - notification.webapi
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       JwtSettings__Issuer: Identity.WebAPI
@@ -273,6 +353,7 @@ volumes:
   jobdb_data:
   recruitmentdb_data:
   identitydb_data:
+  notificationdb_data:
 
 
 
