@@ -12,6 +12,8 @@ COPY ["Services/Job/WebAPI/Job.WebAPI/Job.WebAPI.csproj", "Services/Job/WebAPI/J
 COPY ["Services/Job/Core/Job.Application/Job.Application.csproj", "Services/Job/Core/Job.Application/"]
 COPY ["Services/Job/Core/Job.Domain/Job.Domain.csproj", "Services/Job/Core/Job.Domain/"]
 COPY ["Services/Job/Infrastructure/Job.Infrastructure/Job.Infrastructure.csproj", "Services/Job/Infrastructure/Job.Infrastructure/"]
+COPY ["BuildingBlocks/Messaging.Contracts/Messaging.Contracts.csproj", "BuildingBlocks/Messaging.Contracts/"]
+COPY ["BuildingBlocks/Messaging.RabbitMq/Messaging.RabbitMq.csproj", "BuildingBlocks/Messaging.RabbitMq/"]
 RUN dotnet restore "./Services/Job/WebAPI/Job.WebAPI/Job.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/Services/Job/WebAPI/Job.WebAPI"

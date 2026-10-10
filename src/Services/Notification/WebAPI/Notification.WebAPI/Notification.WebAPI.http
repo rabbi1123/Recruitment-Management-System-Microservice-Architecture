@@ -1,0 +1,15 @@
+@Notification.WebAPI_HostAddress = http://localhost:5051
+
+POST {{Notification.WebAPI_HostAddress}}/api/notifications/get-list
+Content-Type: application/json
+
+{}
+
+###
+
+POST {{Notification.WebAPI_HostAddress}}/api/notifications/get-by-id
+Content-Type: application/json
+
+{
+  "id": 1
+}

@@ -13,6 +13,7 @@ using Job.Infrastructure.Files;
 using Job.Infrastructure.Images;
 using Job.Infrastructure.Repositories;
 using Common.Platform.Domain.Abstractions;
+using Messaging.RabbitMq;
 using Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,8 @@ namespace Job.Infrastructure
 	{
 		public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 		{
+			services.AddRabbitMq(configuration, "job");
+
 			//services
 			//	.AddOptions<JwtSettings>()
 			//	.BindConfiguration("JwtSettings")

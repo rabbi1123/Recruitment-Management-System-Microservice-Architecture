@@ -11,6 +11,7 @@ COPY ["Identity/Identity.Application/Identity.Application.csproj", "Identity/Ide
 COPY ["Identity/Identity.Domain/Identity.Domain.csproj", "Identity/Identity.Domain/"]
 COPY ["Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "Identity/Identity.Infrastructure/"]
 COPY ["BuildingBlocks/Messaging.Contracts/Messaging.Contracts.csproj", "BuildingBlocks/Messaging.Contracts/"]
+COPY ["BuildingBlocks/Messaging.RabbitMq/Messaging.RabbitMq.csproj", "BuildingBlocks/Messaging.RabbitMq/"]
 RUN dotnet restore "./Identity/Identity.WebAPI/Identity.WebAPI.csproj"
 COPY Identity/ Identity/
 COPY BuildingBlocks/ BuildingBlocks/

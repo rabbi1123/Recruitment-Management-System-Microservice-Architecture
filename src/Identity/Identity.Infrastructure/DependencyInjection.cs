@@ -4,7 +4,7 @@ using Identity.Application.Common.Options;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Services;
-using MassTransit;
+using Messaging.RabbitMq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,31 +28,13 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddOptions<RabbitMqSettings>()
-            .Bind(configuration.GetSection(RabbitMqSettings.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         var identitySettings = configuration.GetSection(IdentitySettings.SectionName).Get<IdentitySettings>()
             ?? new IdentitySettings();
-
-        var rabbitMqSettings = configuration.GetSection(RabbitMqSettings.SectionName).Get<RabbitMqSettings>()
-            ?? new RabbitMqSettings();
 
         services.AddDbContext<IdentityDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("IdentityDb")));
 
-        services.AddMassTransit(x =>
-        {
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(rabbitMqSettings.Host, h =>
-                {
-                    h.Username(rabbitMqSettings.Username);
-                    h.Password(rabbitMqSettings.Password);
-                });
-            });
-        });
+        services.AddRabbitMq(configuration, "identity");
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
@@ -105,9 +87,8 @@ public static class DependencyInjection
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IEmailVerificationTokenService, EmailVerificationTokenService>();
         services.AddScoped<IIdentityService, IdentityService>();
-        services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
 
         return services;
     }

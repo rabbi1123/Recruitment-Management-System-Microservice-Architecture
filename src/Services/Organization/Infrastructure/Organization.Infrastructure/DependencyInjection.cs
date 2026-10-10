@@ -13,6 +13,7 @@ using Organization.Infrastructure.Files;
 using Organization.Infrastructure.Images;
 using Organization.Infrastructure.Repositories;
 using Common.Platform.Domain.Abstractions;
+using Messaging.RabbitMq;
 using Dapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,8 @@ namespace Organization.Infrastructure
 	{
 		public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 		{
+			services.AddRabbitMq(configuration, "organization");
+
 			//services
 			//	.AddOptions<JwtSettings>()
 			//	.BindConfiguration("JwtSettings")

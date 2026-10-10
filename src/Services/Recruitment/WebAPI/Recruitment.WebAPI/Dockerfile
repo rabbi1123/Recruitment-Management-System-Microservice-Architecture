@@ -12,6 +12,8 @@ COPY ["Services/Recruitment/WebAPI/Recruitment.WebAPI/Recruitment.WebAPI.csproj"
 COPY ["Services/Recruitment/Core/Recruitment.Application/Recruitment.Application.csproj", "Services/Recruitment/Core/Recruitment.Application/"]
 COPY ["Services/Recruitment/Core/Recruitment.Domain/Recruitment.Domain.csproj", "Services/Recruitment/Core/Recruitment.Domain/"]
 COPY ["Services/Recruitment/Infrastructure/Recruitment.Infrastructure/Recruitment.Infrastructure.csproj", "Services/Recruitment/Infrastructure/Recruitment.Infrastructure/"]
+COPY ["BuildingBlocks/Messaging.Contracts/Messaging.Contracts.csproj", "BuildingBlocks/Messaging.Contracts/"]
+COPY ["BuildingBlocks/Messaging.RabbitMq/Messaging.RabbitMq.csproj", "BuildingBlocks/Messaging.RabbitMq/"]
 RUN dotnet restore "./Services/Recruitment/WebAPI/Recruitment.WebAPI/Recruitment.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/Services/Recruitment/WebAPI/Recruitment.WebAPI"

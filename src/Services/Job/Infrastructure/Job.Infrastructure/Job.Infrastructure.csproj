@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Job.Application\Job.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\BuildingBlocks\Messaging.RabbitMq\Messaging.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>

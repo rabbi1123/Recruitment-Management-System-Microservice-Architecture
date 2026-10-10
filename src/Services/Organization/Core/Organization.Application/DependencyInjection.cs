@@ -64,6 +64,12 @@ namespace Organization.Application
 				.Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IGenericRequest<>));
 		}
 
+		private static bool HasHandwrittenHandler(Assembly assembly, params string[] handlerNames)
+		{
+			return assembly.GetTypes().Any(t =>
+				!t.IsAbstract && !t.IsInterface && handlerNames.Contains(t.Name));
+		}
+
 		public static void AddGenericHandlersForEntities(IServiceCollection services)
 		{
 			var assembly = typeof(DependencyInjection).Assembly;
@@ -98,8 +104,10 @@ namespace Organization.Application
 
 
 
-				// CreateCommandHandler
-				if (createCommandType != null)
+				// Handwritten Add/Update handlers own publish rules. Register the generic
+				// handler only when that class does not already exist.
+				if (createCommandType != null &&
+					!HasHandwrittenHandler(assembly, $"Add{entityName}CommandHandler", $"Create{entityName}CommandHandler"))
 				{
 					services.AddScoped(
 						typeof(IRequestHandler<,>).MakeGenericType(createCommandType, typeof(Result<CommandResponse>)),
@@ -107,8 +115,8 @@ namespace Organization.Application
 					);
 				}
 
-				// UpdateCommandHandler
-				if (updateCommandType != null)
+				if (updateCommandType != null &&
+					!HasHandwrittenHandler(assembly, $"Update{entityName}CommandHandler"))
 				{
 					services.AddScoped(
 						typeof(IRequestHandler<,>).MakeGenericType(updateCommandType, typeof(Result<CommandResponse>)),
